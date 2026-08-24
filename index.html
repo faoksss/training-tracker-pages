@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Tracker — клієнти, розклад і абонементи в Telegram</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:           #0d1117;
+      --bg-card:      rgba(255,255,255,0.055);
+      --bg-card-h:    rgba(255,255,255,0.08);
+      --border:       rgba(255,255,255,0.1);
+      --border-brand: rgba(0,136,204,0.35);
+      --brand:        #0088cc;
+      --brand-alt:    #5eb8e8;
+      --text:         #fff;
+      --text-muted:   rgba(255,255,255,0.55);
+      --text-faint:   rgba(255,255,255,0.38);
+      --radius:       16px;
+      --nav-h:        60px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 500;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    svg { display: block; }
+
+    .accent {
+      background: linear-gradient(135deg, var(--brand), var(--brand-alt));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .section {
+      padding: 80px 24px;
+      max-width: 1160px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--brand);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(24px, 3.5vw, 38px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      font-size: clamp(15px, 2vw, 17px);
+      color: var(--text-muted);
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+      white-space: nowrap;
+      border: none;
+      min-height: 48px;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.22); }
+    .btn-full { width: 100%; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 24px;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(13,17,23,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-logo {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+    }
+    .nav-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .nav-name { font-size: 15px; font-weight: 800; color: var(--text); letter-spacing: -0.2px; }
+
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-link {
+      font-size: 14px; font-weight: 600; color: var(--text-muted);
+      text-decoration: none; padding: 8px 12px; border-radius: 8px;
+      transition: color 0.15s;
+    }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta { padding: 10px 18px; font-size: 14px; min-height: 44px; }
+
+    /* ── HERO ── */
+    .hero-wrap {
+      padding-top: var(--nav-h);
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-glow-tr {
+      position: absolute;
+      width: 860px; height: 860px;
+      top: -240px; right: -180px;
+      background: radial-gradient(circle, rgba(0,136,204,0.2) 0%, rgba(0,136,204,0.06) 42%, transparent 68%);
+      pointer-events: none;
+    }
+    .hero-glow-bl {
+      position: absolute;
+      width: 500px; height: 500px;
+      bottom: -200px; left: -100px;
+      background: radial-gradient(circle, rgba(0,136,204,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 64px 24px 80px;
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) minmax(460px, 580px);
+      gap: 24px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 99px;
+      background: rgba(0,136,204,0.1);
+      border: 1px solid rgba(0,136,204,0.28);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--brand-alt);
+      margin-bottom: 20px;
+    }
+    .hero-chip-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brand); flex-shrink: 0; }
+
+    .hero-h1 {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(34px, 5.5vw, 58px);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      color: var(--text);
+      margin-bottom: 18px;
+    }
+
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 18px);
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      max-width: 440px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .hero-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--text-faint);
+      line-height: 1.45;
+    }
+
+    @keyframes hero-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    .hero-ph-front { animation: hero-float 6s ease-in-out infinite; }
+
+    .hero-phone-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .hero-phones {
+      position: relative;
+      width: 540px;
+      height: 500px;
+      flex-shrink: 0;
+    }
+
+    .hero-phones .ph-frame { position: absolute; }
+
+    .hero-ph-left {
+      width: 196px;
+      left: 0;
+      top: 48px;
+      transform: perspective(900px) rotateY(7deg);
+      opacity: 0.84;
+      z-index: 1;
+    }
+    .hero-ph-right {
+      width: 196px;
+      left: 292px;
+      top: 48px;
+      transform: perspective(900px) rotateY(-7deg);
+      opacity: 0.84;
+      z-index: 1;
+    }
+    .hero-ph-left .ph-screen,
+    .hero-ph-right .ph-screen { height: 378px; }
+    .hero-ph-left .tgb,
+    .hero-ph-right .tgb { height: 28px; padding: 0 8px; }
+    .hero-ph-left .tgb-av,
+    .hero-ph-right .tgb-av { width: 15px; height: 15px; }
+    .hero-ph-left .pnav,
+    .hero-ph-right .pnav { padding: 4px 0 3px; }
+    .hero-ph-left .pnt-label,
+    .hero-ph-right .pnt-label { font-size: 5.5px; font-weight: 600; }
+
+    .hero-ph-front {
+      width: 228px;
+      left: 148px;
+      top: 14px;
+      z-index: 3;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.6),
+        0 6px 20px rgba(0,100,160,0.24),
+        0 0 48px rgba(0,136,204,0.14);
+    }
+    .hero-ph-front .ph-screen { height: 438px; }
+    .hero-ph-front .tgb { height: 34px; padding: 0 10px; }
+    .hero-ph-front .tgb-av { width: 19px; height: 19px; }
+    .hero-ph-front .pnav { padding: 5px 0 4px; }
+    .hero-ph-front .pnt-label { font-size: 6px; font-weight: 600; }
+
+    /* ── PHONE MOCKUP (shared) ── */
+    .ph-frame {
+      padding: 7px;
+      border-radius: 34px;
+      background: linear-gradient(160deg, #222831 0%, #12161c 55%, #0a0d11 100%);
+      border: 1px solid rgba(255,255,255,0.14);
+      position: relative;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.6),
+        0 6px 20px rgba(0,100,160,0.2),
+        0 0 60px rgba(0,136,204,0.12);
+    }
+    .ph-frame::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      transform: translateX(-50%);
+      width: 34%;
+      height: 3px;
+      border-radius: 2px;
+      background: rgba(255,255,255,0.2);
+    }
+    .ph-screen {
+      border-radius: 27px;
+      overflow: hidden;
+      background: #17212b;
+      display: flex;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #fff;
+    }
+
+    /* TG bar */
+    .tgb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #17212b;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      flex-shrink: 0;
+    }
+    .tgb-center { display: flex; align-items: center; gap: 5px; flex: 1; justify-content: center; min-width: 0; }
+    .tgb-av { border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+    .tgb-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .tgb-dots { letter-spacing: 1.5px; color: rgba(255,255,255,0.45); flex-shrink: 0; }
+    .tgb-icon { color: rgba(255,255,255,0.6); display: flex; align-items: center; flex-shrink: 0; }
+
+    /* Bottom nav */
+    .pnav {
+      display: flex;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: #17212b;
+      flex-shrink: 0;
+    }
+    .pnt {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      color: rgba(255,255,255,0.35);
+      position: relative;
+    }
+    .pnt.on { color: #0088cc; }
+    .pnt-dot {
+      position: absolute;
+      bottom: -3px;
+      width: 12px; height: 2.5px;
+      background: #0088cc;
+      border-radius: 2px;
+    }
+
+    .ps-body {
+      flex: 1;
+      overflow: hidden;
+      padding: 12px 12px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Mini-app type scale (Telegram sans, real TMA tokens) */
+    .mock-page {
+      flex: 1;
+      overflow: hidden;
+      padding: 10px 10px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .mock-kicker {
+      font-size: 6.5px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: rgba(255,255,255,0.45);
+    }
+    .mock-h1 {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.15;
+      letter-spacing: -0.35px;
+    }
+    .mock-h2 {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+      letter-spacing: -0.2px;
+    }
+    .mock-sub {
+      font-size: 7px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.35;
+    }
+    .mock-seg { display: flex; gap: 4px; }
+    .mock-seg button, .mock-seg .seg {
+      flex: 1;
+      text-align: center;
+      padding: 6px 0;
+      border-radius: 8px;
+      font-size: 7.5px;
+      font-weight: 600;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .mock-seg .on {
+      background: rgba(0,136,204,0.2);
+      border: 2px solid rgba(0,136,204,0.5);
+      padding: 5px 0;
+    }
+    .mock-card {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 7px 8px;
+    }
+    .mock-day {
+      font-size: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.38);
+    }
+    .mock-name { font-size: 8px; font-weight: 600; color: #fff; }
+    .mock-meta { font-size: 6.5px; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+    .mock-chip {
+      font-size: 5.5px;
+      font-weight: 600;
+      padding: 1px 5px;
+      border-radius: 99px;
+      background: rgba(0,136,204,0.12);
+      border: 1px solid rgba(0,136,204,0.25);
+      color: rgb(96,165,250);
+    }
+    .mock-badge {
+      font-size: 5.5px;
+      font-weight: 700;
+      color: #4ade80;
+      background: rgba(74,222,128,0.16);
+      padding: 1px 5px;
+      border-radius: 99px;
+    }
+    .mock-av {
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      overflow: hidden;
+      background: rgba(0,136,204,0.25);
+    }
+    .mock-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ── SCREENS SECTION ── */
+    .screens-wrap {
+      background: rgba(255,255,255,0.018);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .screens-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 72px 24px;
+    }
+
+    .phones-showcase {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 0;
+      margin-top: 56px;
+      position: relative;
+      height: 480px;
+    }
+
+    /* Desktop 3-phone layout */
+    .ss-left, .ss-right {
+      width: 210px;
+      flex-shrink: 0;
+    }
+    .ss-left .ph-screen  { height: 410px; }
+    .ss-right .ph-screen { height: 410px; }
+    .ss-left .tgb, .ss-right .tgb { height: 30px; padding: 0 8px; }
+    .ss-left .tgb-av, .ss-right .tgb-av { width: 16px; height: 16px; }
+    .ss-left .pnav, .ss-right .pnav { padding: 4px 0 3px; }
+
+    .ss-left {
+      transform: perspective(900px) rotateY(7deg);
+      opacity: 0.85;
+      z-index: 1;
+      margin-right: -20px;
+      align-self: center;
+    }
+    .ss-right {
+      transform: perspective(900px) rotateY(-7deg);
+      opacity: 0.85;
+      z-index: 1;
+      margin-left: -20px;
+      align-self: center;
+    }
+
+    .ss-center {
+      width: 245px;
+      z-index: 3;
+      flex-shrink: 0;
+      box-shadow:
+        0 20px 60px rgba(0,0,0,0.6),
+        0 6px 20px rgba(0,100,160,0.24),
+        0 0 60px rgba(0,136,204,0.15);
+    }
+    .ss-center .ph-screen { height: 460px; }
+    .ss-center .tgb { height: 34px; padding: 0 10px; }
+    .ss-center .tgb-av { width: 19px; height: 19px; }
+    .ss-center .pnav { padding: 6px 0 5px; }
+
+    .ss-center .pnt-label { font-size: 6px; font-weight: 600; }
+    .ss-left .pnt-label, .ss-right .pnt-label { font-size: 5.5px; font-weight: 600; }
+
+    /* Screen labels under phones */
+    .phone-label {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-faint);
+      margin-top: 14px;
+    }
+
+    /* Mobile: horizontal scroll */
+    .phones-scroll-wrap {
+      display: none;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      padding: 20px 24px 32px;
+      gap: 16px;
+      margin-top: 40px;
+      scrollbar-width: none;
+    }
+    .phones-scroll-wrap::-webkit-scrollbar { display: none; }
+
+    .scroll-phone-item {
+      scroll-snap-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .scroll-phone-item .ph-frame { width: 200px; }
+    .scroll-phone-item .ph-screen { height: 380px; }
+    .scroll-phone-item .tgb { height: 28px; padding: 0 8px; }
+    .scroll-phone-item .tgb-av { width: 15px; height: 15px; }
+    .scroll-phone-item .tgb-name { font-size: 7px; }
+    .scroll-phone-item .pnav { padding: 4px 0 3px; }
+    .scroll-phone-item .pnt-label { font-size: 5.5px; font-weight: 600; }
+
+    /* ── AUDIENCE ── */
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 44px;
+    }
+
+    .aud-card {
+      padding: 24px 20px;
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+    .aud-card:hover { background: var(--bg-card-h); transform: translateY(-2px); }
+    .aud-card.featured {
+      background: rgba(0,136,204,0.1);
+      border-color: var(--border-brand);
+    }
+
+    .aud-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,136,204,0.12);
+      color: var(--brand-alt);
+      margin-bottom: 14px;
+    }
+    .aud-card.featured .aud-icon { background: rgba(0,136,204,0.22); }
+    .aud-icon svg { width: 22px; height: 22px; }
+
+    .aud-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px; letter-spacing: -0.2px; }
+    .aud-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+    .aud-bullets {
+      list-style: none;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .aud-bullets li {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.4;
+    }
+    .aud-bullets li::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--brand);
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+    .aud-cta {
+      margin-top: auto;
+      padding-top: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--brand-alt);
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-wrap {
+      background: rgba(255,255,255,0.018);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── REVIEWS ── */
+    .reviews-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .reviews-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      padding-bottom: 2px;
+    }
+    .reviews-arrow {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .reviews-arrow:hover {
+      border-color: var(--border-brand);
+      background: var(--bg-card-h);
+    }
+    .reviews-arrow svg { width: 18px; height: 18px; }
+    .reviews-track-wrap {
+      margin-top: 36px;
+      margin-right: calc(50% - 50vw);
+    }
+    .reviews-track {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      padding-right: 24px;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-x;
+      position: relative;
+    }
+    .reviews-track.is-marquee {
+      scroll-snap-type: none;
+      scroll-behavior: auto;
+    }
+    .reviews-track::-webkit-scrollbar { display: none; }
+    .review-card {
+      flex: 0 0 min(360px, 78vw);
+      min-height: 228px;
+      padding: 22px;
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scroll-snap-align: start;
+    }
+    .reviews-dots {
+      display: flex;
+      justify-content: flex-start;
+      gap: 6px;
+      margin-top: 18px;
+    }
+    .reviews-progress { display: none; }
+    .review-quote {
+      font-size: 14px;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.55;
+      flex: 1;
+    }
+    .review-role {
+      display: inline-flex;
+      align-self: flex-start;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--brand-alt);
+      background: rgba(0,136,204,0.12);
+      border: 1px solid var(--border-brand);
+      padding: 4px 10px;
+      border-radius: 99px;
+    }
+    .review-person {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+    }
+    .review-av {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: rgba(0,136,204,0.2);
+    }
+    .review-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .review-name { font-size: 14px; font-weight: 800; color: var(--text); }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      margin-top: 52px;
+      position: relative;
+    }
+
+    .step { padding: 0 32px 0 0; position: relative; }
+    .step:last-child { padding-right: 0; }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 22px; right: 10px;
+      width: 2px; height: 48px;
+      background: linear-gradient(to bottom, rgba(0,136,204,0.45), transparent);
+    }
+
+    .step-num {
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+      display: block;
+      font-family: 'Unbounded', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      color: var(--brand-alt);
+      margin-bottom: 14px;
+    }
+    .step-title { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 7px; letter-spacing: -0.2px; }
+    .step-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── FEATURES ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 44px;
+    }
+
+    .feat-card {
+      padding: 22px;
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .feat-card:hover {
+      border-color: rgba(0,136,204,0.28);
+      background: var(--bg-card-h);
+    }
+
+    .feat-icon {
+      width: 42px; height: 42px;
+      border-radius: 11px;
+      background: rgba(0,136,204,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--brand-alt);
+      margin-bottom: 13px;
+    }
+    .feat-icon svg { width: 20px; height: 20px; }
+    .feat-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 5px; letter-spacing: -0.1px; }
+    .feat-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+    .feat-card.is-hidden { display: none; }
+
+    .feat-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 28px;
+    }
+    .feat-pill {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .feat-pill.on {
+      background: rgba(0,136,204,0.14);
+      border-color: var(--border-brand);
+      color: var(--brand-alt);
+    }
+
+    /* ── PRICING ── */
+    .pricing-free-note {
+      margin-top: 28px;
+      padding: 18px 22px;
+      border-radius: var(--radius);
+      background: rgba(0,136,204,0.08);
+      border: 1px solid var(--border-brand);
+      font-size: 15px;
+      color: var(--text-muted);
+      line-height: 1.55;
+      max-width: 720px;
+    }
+    .pricing-free-note strong {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 28px;
+      align-items: start;
+    }
+
+    .plan-card {
+      padding: 26px 22px;
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .plan-card.highlighted {
+      background: rgba(0,136,204,0.08);
+      border-color: var(--border-brand);
+      box-shadow: 0 0 48px rgba(0,136,204,0.12);
+    }
+
+    .plan-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--brand);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 14px;
+      border-radius: 99px;
+      white-space: nowrap;
+    }
+
+    .plan-name {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+    .plan-tagline { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.45; }
+    .plan-price {
+      font-family: 'Unbounded', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.6px;
+      margin-bottom: 4px;
+    }
+    .plan-price span { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600; color: var(--text-muted); }
+    .plan-period { font-size: 12px; color: var(--text-faint); margin-bottom: 20px; }
+
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 24px;
+    }
+    .plan-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.4;
+    }
+    .plan-check {
+      width: 17px; height: 17px;
+      border-radius: 50%;
+      background: rgba(0,136,204,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: var(--brand-alt);
+    }
+    .plan-check svg { width: 10px; height: 10px; }
+
+    .plan-btn {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      font-family: 'Manrope', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: opacity 0.15s, transform 0.15s;
+      min-height: 44px;
+      line-height: 1.4;
+    }
+    .plan-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .plan-btn-primary { background: var(--brand); color: #fff; }
+    .plan-btn-ghost { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* ── FOOTER CTA ── */
+    .fcta-wrap {
+      text-align: center;
+      padding: 96px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .fcta-glow {
+      position: absolute;
+      width: 640px; height: 640px;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(0,136,204,0.13) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .fcta-inner { position: relative; z-index: 2; max-width: 520px; margin: 0 auto; }
+    .fcta-title {
+      font-family: 'Unbounded', sans-serif;
+      font-size: clamp(26px, 4vw, 44px);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.6px;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+    .fcta-sub { font-size: clamp(14px, 2vw, 17px); color: var(--text-muted); margin-bottom: 32px; line-height: 1.5; }
+
+    .faq-list { margin-top: 40px; display: flex; flex-direction: column; gap: 8px; max-width: 720px; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-card);
+      padding: 0 18px;
+    }
+    .faq-item summary {
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px 0;
+      list-style: none;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item p { font-size: 14px; color: var(--text-muted); line-height: 1.6; padding-bottom: 16px; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 24px;
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .footer-logo { width: 28px; height: 28px; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,0.1); }
+    .footer-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .footer-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .footer-copy { font-size: 12px; color: var(--text-faint); }
+
+    hr.divider { border: none; border-top: 1px solid var(--border); }
+
+    /* ── RESPONSIVE ── */
+
+    /* Tablet */
+    @media (max-width: 960px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 56px 24px 64px;
+      }
+      .hero-h1 { font-size: clamp(34px, 7vw, 50px); }
+      .hero-sub { max-width: 100%; margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .hero-note { margin-left: auto; margin-right: auto; max-width: 420px; }
+      .hero-phone-wrap {
+        margin-top: 8px;
+        overflow-x: auto;
+        overflow-y: visible;
+        width: 100%;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+      }
+      .hero-phones {
+        width: 540px;
+        height: 500px;
+        transform: none;
+        margin: 0 auto;
+      }
+
+      .audience-grid { grid-template-columns: 1fr 1fr; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+
+      .steps-grid { grid-template-columns: 1fr; gap: 40px; }
+      .step { padding: 0; }
+      .step:not(:last-child)::after { display: none; }
+
+      .pricing-grid { grid-template-columns: 1fr; max-width: 480px; margin-left: auto; margin-right: auto; }
+      .reviews-head { flex-wrap: wrap; align-items: flex-start; }
+      .plan-card.highlighted { margin-top: 12px; }
+
+      .nav-link { display: none; }
+
+      /* Switch to scroll on tablet */
+      .phones-showcase { display: none; }
+      .phones-scroll-wrap { display: flex; }
+    }
+
+    /* Mobile */
+    @media (max-width: 600px) {
+      :root { --nav-h: 56px; }
+
+      .section { padding: 56px 16px; }
+
+      .hero-inner { padding: 48px 16px 56px; gap: 32px; }
+      .hero-h1 { font-size: clamp(30px, 9vw, 44px); letter-spacing: -0.5px; }
+      .hero-chip { font-size: 12px; }
+      .hero-sub { font-size: 15px; }
+      .hero-actions { flex-direction: column; width: 100%; }
+      .hero-actions .btn { width: 100%; }
+
+      .audience-grid { grid-template-columns: 1fr; max-width: 100%; }
+      .reviews-track-wrap { margin-right: -16px; }
+      .review-card { flex-basis: min(300px, 82vw); }
+
+      .features-grid { grid-template-columns: 1fr 1fr; }
+
+      footer { flex-direction: column; text-align: center; gap: 8px; }
+
+      .fcta-wrap { padding: 64px 16px; }
+
+      nav { padding: 0 16px; }
+      .nav-name { font-size: 14px; }
+
+      .scroll-phone-item .ph-frame { width: 186px; }
+      .scroll-phone-item .ph-screen { height: 354px; }
+
+      .phones-scroll-wrap { padding: 16px 24px 24px; }
+
+      .screens-inner { padding: 56px 16px; }
+
+      .hero-phones {
+        transform: scale(calc((100vw - 32px) / 540));
+        transform-origin: top center;
+        height: calc(500px * (100vw - 32px) / 540);
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .hero-phone-wrap { overflow: visible; }
+
+      .step:not(:last-child)::after {
+        display: block;
+        top: 46px;
+        right: auto;
+        left: 22px;
+        width: 2px;
+        height: 20px;
+      }
+    }
+
+    /* Scroll dots */
+    .scroll-dots {
+      display: none;
+      justify-content: center;
+      gap: 6px;
+      padding: 4px 0 8px;
+    }
+    .scroll-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.2s, width 0.2s;
+      flex-shrink: 0;
+    }
+    .scroll-dot.active {
+      background: var(--brand);
+      width: 18px;
+    }
+    @media (max-width: 960px) {
+      .scroll-dots { display: flex; }
+    }
+
+    /* Extra small */
+    @media (max-width: 380px) {
+      .hero-h1 { font-size: 28px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hero-ph-front { animation: none; }
+      .reviews-track { scroll-behavior: auto; }
+      .reviews-progress { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAV ── -->
+  <nav>
+    <a href="#" class="nav-brand">
+      <div class="nav-logo"><img src="logo.jpeg" alt="Training Tracker"></div>
+      <span class="nav-name">Training Tracker</span>
+    </a>
+    <div class="nav-links">
+      <a href="#how" class="nav-link">Як це працює</a>
+      <a href="#reviews" class="nav-link">Відгуки</a>
+      <a href="#pricing" class="nav-link">Тарифи</a>
+      <a href="#faq" class="nav-link">Питання</a>
+      <a href="https://t.me/TheTrainingTrackerBot" class="btn btn-primary nav-cta" target="_blank" rel="noopener">Відкрити в Telegram</a>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <div class="hero-wrap">
+    <div class="hero-glow-tr" aria-hidden="true"></div>
+    <div class="hero-glow-bl" aria-hidden="true"></div>
+    <div class="hero-grid" aria-hidden="true"></div>
+
+    <div class="hero-inner">
+      <div class="hero-copy">
+        <h1 class="hero-h1">
+          Тренування, розклад і абонементи<br>
+          <span class="accent">в одному боті</span>
+        </h1>
+        <p class="hero-sub">
+          Training Tracker — бот у Telegram для тренерів і спортсменів. Без окремого додатка й без реєстрації: відкрили бота і працюєте.
+        </p>
+        <div class="hero-actions">
+          <a href="https://t.me/TheTrainingTrackerBot" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+            Відкрити в Telegram
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Desktop + mobile: 3-phone cluster (schedule, home, workout) -->
+      <div class="hero-phone-wrap">
+        <div class="hero-phones">
+
+
+        <!-- LEFT: Schedule -->
+        <div class="ph-frame hero-ph-left">
+          <div class="ph-screen">
+            <div class="tgb" style="height:28px;padding:0 8px">
+              <div class="tgb-icon" style="color:rgba(255,255,255,0.6)">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </div>
+              <div class="tgb-center">
+                <div class="tgb-av" style="width:15px;height:15px"><img src="logo.jpeg" alt=""></div>
+                <span style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
+              </div>
+              <span class="tgb-dots" style="font-size:9px">···</span>
+            </div>
+            <div class="mock-page">
+              <div class="mock-h2">Розклад клієнтів цього тижня</div>
+              <div class="mock-sub">Всі заплановані тренування на поточний тиждень</div>
+              <div class="mock-seg">
+                <div class="seg on">Тиждень</div>
+                <div class="seg">День</div>
+              </div>
+              <div class="mock-card" style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px">
+                <span style="font-size:7px;font-weight:500;color:rgba(255,255,255,0.55)">Минулі тренування</span>
+                <span style="display:flex;align-items:center;gap:5px">
+                  <span style="font-size:6px;font-weight:600;padding:1px 5px;border-radius:99px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.45)">3</span>
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2.2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </span>
+              </div>
+              <div class="mock-day">П'ятниця, Серпень 21</div>
+              <div class="mock-card" style="display:flex;align-items:center;gap:6px;position:relative">
+                <div class="mock-av" style="width:22px;height:22px"><img src="avatars/maya.jpg" alt=""></div>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+                    <span class="mock-name">Maya Lin</span>
+                    <span class="mock-badge">Наступне тренування</span>
+                  </div>
+                  <div class="mock-meta" style="margin-top:2px">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>11:00 – 12:00</span>
+                    <span class="mock-chip">Як тренер</span>
+                  </div>
+                </div>
+                <span style="color:rgba(255,255,255,0.28);font-size:10px;flex-shrink:0">›</span>
+              </div>
+              <div class="mock-card" style="display:flex;align-items:center;gap:6px">
+                <div class="mock-av" style="width:22px;height:22px"><img src="avatars/sarah.jpg" alt=""></div>
+                <div style="flex:1;min-width:0">
+                  <div class="mock-name">Sarah Jenkins</div>
+                  <div class="mock-meta" style="margin-top:2px">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>18:00 – 19:30</span>
+                    <span class="mock-chip">Як тренер</span>
+                  </div>
+                </div>
+                <span style="color:rgba(255,255,255,0.28);font-size:10px;flex-shrink:0">›</span>
+              </div>
+              <div class="mock-day">Неділя, Серпень 23</div>
+            </div>
+            <div class="pnav" style="padding:4px 0 3px">
+              <div class="pnt"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="pnt-label">Головна</span></div>
+              <div class="pnt on"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="pnt-label">Розклад</span><div class="pnt-dot"></div></div>
+              <div class="pnt"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="pnt-label">Абонементи</span></div>
+              <div class="pnt"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="pnt-label">Більше</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CENTER: Dashboard -->
+        <div class="ph-frame hero-ph-front">
+          <div class="ph-screen">
+            <div class="tgb" style="height:34px;padding:0 8px">
+              <span style="font-size:15px;color:rgba(255,255,255,0.55);line-height:1">×</span>
+              <div class="tgb-center">
+                <div class="tgb-av" style="width:19px;height:19px"><img src="logo.jpeg" alt=""></div>
+                <span style="font-size:7.5px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
+              </div>
+              <span class="tgb-dots" style="font-size:9px">···</span>
+            </div>
+            <div class="ps-body" style="gap:8px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between">
+                <div>
+                  <div class="mock-h1">Добрий день, Andriy</div>
+                </div>
+                <div class="mock-av" style="width:24px;height:24px"><img src="avatars/andriy.jpg" alt=""></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;background:rgba(0,136,204,0.07);border:1px solid rgba(0,136,204,0.21)">
+                <span style="font-size:11px;line-height:1">🤖</span>
+                <span style="flex:1;font-size:7px;color:rgba(255,255,255,0.55);line-height:1.3">Є питання щодо застосунку?</span>
+                <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#0088cc" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+              <div style="border-radius:14px;padding:11px 12px;position:relative;overflow:hidden;background:linear-gradient(135deg,#005f8f 0%,#0088cc 55%,#3ba8dc 100%)">
+                <div style="position:absolute;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.07);top:-28px;right:-24px"></div>
+                <div style="position:relative">
+                  <div style="font-size:6px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,0.65);margin-bottom:3px">Огляд на сьогодні</div>
+                  <div style="display:flex;align-items:flex-end;gap:5px;margin-bottom:6px">
+                    <span style="font-size:32px;font-weight:800;color:#fff;line-height:0.95;letter-spacing:-1.5px">1</span>
+                    <span style="font-size:8px;font-weight:500;color:rgba(255,255,255,0.8);padding-bottom:3px">тренувань заплановано</span>
+                  </div>
+                  <div style="display:flex;gap:4px;flex-wrap:wrap">
+                    <span style="font-size:6.5px;font-weight:600;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.2);color:#fff">6 цього тижня</span>
+                    <span style="font-size:6.5px;font-weight:600;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.2);color:#fff">10 активних клієнтів</span>
+                  </div>
+                </div>
+              </div>
+              <div style="border-radius:12px;padding:6px 8px;display:flex;align-items:center;gap:6px;background:rgba(255,149,0,0.12);border:1px solid rgba(255,149,0,0.3)">
+                <div style="width:20px;height:20px;border-radius:8px;background:rgba(255,149,0,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">⚡</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:7px;font-weight:700;color:#d97706;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">2 абонементи готові до завершення</div>
+                  <div style="font-size:6px;color:rgba(255,255,255,0.6);line-height:1.3;margin-top:1px;white-space:nowrap;overflow:hidden">Натисніть, щоб переглянути та завершити</div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                  <span style="font-size:10px;font-weight:700;color:#fff">Клієнти</span>
+                  <span style="font-size:8px;font-weight:600;color:#0088cc">Всі</span>
+                </div>
+                <div style="display:flex;gap:5px">
+                  <div style="width:44px;flex-shrink:0;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:1.5px dashed rgba(255,255,255,0.22);border-radius:12px">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <span style="font-size:5.5px;font-weight:600;color:rgba(255,255,255,0.4)">Запросити</span>
+                  </div>
+                  <div style="width:44px;flex-shrink:0;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:12px">
+                    <div class="mock-av" style="width:20px;height:20px"><img src="avatars/john.jpg" alt=""></div>
+                    <span class="mock-name" style="font-size:6px">John</span>
+                  </div>
+                  <div style="width:44px;flex-shrink:0;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:12px">
+                    <div class="mock-av" style="width:20px;height:20px"><img src="avatars/katya.jpg" alt=""></div>
+                    <span class="mock-name" style="font-size:6px">Katya</span>
+                  </div>
+                  <div style="width:44px;flex-shrink:0;height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:12px">
+                    <div class="mock-av" style="width:20px;height:20px"><img src="avatars/dmytro.jpg" alt=""></div>
+                    <span class="mock-name" style="font-size:6px">Dmytro</span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                  <span style="font-size:10px;font-weight:700;color:#fff">Швидкий доступ</span>
+                  <span style="font-size:8px;font-weight:600;color:#0088cc">Змінити</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px">
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 3px 6px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2)">
+                    <div style="width:22px;height:22px;border-radius:8px;background:rgba(0,136,204,0.15);display:flex;align-items:center;justify-content:center;font-size:11px">📅</div>
+                    <span style="font-size:5.5px;font-weight:500;color:#fff;text-align:center;line-height:1.2">Розклад тренувань</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 3px 6px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2)">
+                    <div style="width:22px;height:22px;border-radius:8px;background:rgba(0,136,204,0.15);display:flex;align-items:center;justify-content:center;font-size:11px">📋</div>
+                    <span style="font-size:5.5px;font-weight:500;color:#fff;text-align:center;line-height:1.2">Абонементи</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 3px 6px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2)">
+                    <div style="width:22px;height:22px;border-radius:8px;background:rgba(0,136,204,0.15);display:flex;align-items:center;justify-content:center;font-size:11px">👥</div>
+                    <span style="font-size:5.5px;font-weight:500;color:#fff;text-align:center;line-height:1.2">Клієнти</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="pnav" style="padding:5px 0 4px">
+              <div class="pnt on"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="pnt-label">Головна</span><div class="pnt-dot"></div></div>
+              <div class="pnt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="pnt-label">Розклад</span></div>
+              <div class="pnt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="pnt-label">Абонементи</span></div>
+              <div class="pnt"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="pnt-label">Більше</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Workout -->
+        <div class="ph-frame hero-ph-right">
+          <div class="ph-screen">
+            <div class="tgb" style="height:28px;padding:0 8px">
+              <div class="tgb-icon" style="color:rgba(255,255,255,0.6)">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </div>
+              <div class="tgb-center">
+                <div class="tgb-av" style="width:15px;height:15px"><img src="logo.jpeg" alt=""></div>
+                <span style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
+              </div>
+              <span class="tgb-dots" style="font-size:9px">···</span>
+            </div>
+            <div class="mock-page" style="gap:6px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div>
+                  <div class="mock-kicker" style="text-transform:uppercase;letter-spacing:.08em">Chest and shoulders</div>
+                  <div class="mock-h2" style="margin-top:1px">Тренування</div>
+                </div>
+                <div style="font-size:7px;font-weight:600;color:#0088cc;background:rgba(0,136,204,0.1);border:1px solid rgba(0,136,204,0.25);padding:2px 7px;border-radius:99px">2 / 6</div>
+              </div>
+              <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden">
+                <div style="width:33%;height:100%;background:#0088cc;border-radius:99px"></div>
+              </div>
+              <div class="mock-sub">Перемикайте вправи стрілками на картці або картками зверху й знизу.</div>
+              <div style="background:rgba(0,136,204,0.08);border:1px solid rgba(0,136,204,0.22);border-radius:10px;padding:5px 8px">
+                <div style="font-size:5.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#0088cc;margin-bottom:1px">Попередня</div>
+                <div style="font-size:8px;font-weight:600;color:#fff">Жим в хамері</div>
+              </div>
+              <div class="mock-card" style="border-radius:14px;padding:8px">
+                <div style="display:flex;align-items:center;gap:4px;margin-bottom:7px">
+                  <div style="width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg>
+                  </div>
+                  <div style="flex:1;text-align:center;font-size:10px;font-weight:700;color:#fff;line-height:1.15">Бруси станок</div>
+                  <div style="width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><polyline points="9 18 15 12 9 6"/></svg>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:4px">
+                  <div style="width:16px;height:16px;margin-top:2px;border-radius:50%;background:#0088cc;color:#fff;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+                  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+                    <div>
+                      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 2px;text-align:center;font-size:10px;font-weight:700">60</div>
+                      <div style="font-size:5px;color:rgba(255,255,255,0.45);text-align:center;margin-top:2px;font-weight:500">Вага</div>
+                    </div>
+                    <div>
+                      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 2px;text-align:center;font-size:10px;font-weight:700">12</div>
+                      <div style="font-size:5px;color:rgba(255,255,255,0.45);text-align:center;margin-top:2px;font-weight:500">Повтори</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="height:5px"></div>
+                <div style="display:flex;align-items:flex-start;gap:4px">
+                  <div style="width:16px;height:16px;margin-top:2px;border-radius:50%;background:#0088cc;color:#fff;font-size:7px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+                  <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+                    <div>
+                      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 2px;text-align:center;font-size:10px;font-weight:700">65</div>
+                      <div style="font-size:5px;color:rgba(255,255,255,0.45);text-align:center;margin-top:2px;font-weight:500">Вага</div>
+                    </div>
+                    <div>
+                      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:5px 2px;text-align:center;font-size:10px;font-weight:700">8</div>
+                      <div style="font-size:5px;color:rgba(255,255,255,0.45);text-align:center;margin-top:2px;font-weight:500">Повтори</div>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top:6px;border:1.5px dashed rgba(255,255,255,0.18);border-radius:8px;padding:5px;text-align:center;font-size:6.5px;font-weight:600;color:rgba(255,255,255,0.4)">Додати підхід</div>
+              </div>
+            </div>
+            <div class="pnav" style="padding:4px 0 3px">
+              <div class="pnt"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span class="pnt-label">Головна</span></div>
+              <div class="pnt"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="pnt-label">Розклад</span></div>
+              <div class="pnt"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="pnt-label">Абонементи</span></div>
+              <div class="pnt"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="pnt-label">Більше</span></div>
+            </div>
+          </div>
+        </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AUDIENCE ── -->
+  <div id="audience">
+    <div class="section">
+      <div class="section-tag">Кому підійде</div>
+      <h2 class="section-title">Для тренерів і спортсменів</h2>
+      <p class="section-sub">Training Tracker підлаштовується під вашу роль — оберіть, що підходить саме вам.</p>
+
+      <div class="audience-grid">
+        <a class="aud-card featured" href="#plan-pro" data-filter="coach">
+          <div class="aud-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div class="aud-title">Тренерам</div>
+          <div class="aud-desc">Керуйте клієнтами, розкладом і абонементами в одному місці.</div>
+          <ul class="aud-bullets">
+            <li>Ведення, історія і прогрес клієнтів</li>
+            <li>Тижневий і денний розклад</li>
+            <li>Управління абонементами і тренувальними програмами</li>
+            <li>Pro View — моніторинг тренувань у реальному часі, зручна робота з декількома клієнтами одночасно</li>
+          </ul>
+        </a>
+
+        <a class="aud-card" href="#plan-free" data-filter="trainee">
+          <div class="aud-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <polyline points="16 11 18 13 22 9"/>
+            </svg>
+          </div>
+          <div class="aud-title">Клієнтам з тренером</div>
+          <div class="aud-desc">Отримуйте програму і відстежуйте прогрес разом із тренером.</div>
+          <ul class="aud-bullets">
+            <li>Програма тренувань від тренера</li>
+            <li>Перегляд розкладу занять</li>
+            <li>Статус абонементу, залишок занять завжди під рукою</li>
+            <li>Режим тренування та історія прогресу</li>
+          </ul>
+        </a>
+
+        <a class="aud-card" href="#plan-solo" data-filter="solo">
+          <div class="aud-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+            </svg>
+          </div>
+          <div class="aud-title">Самостійним</div>
+          <div class="aud-desc">Тренуйтесь самостійно і ведіть повну історію прогресу.</div>
+          <ul class="aud-bullets">
+            <li>Управління тренувальними програмами</li>
+            <li>Режим тренування та повна історія прогресу</li>
+          </ul>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HOW IT WORKS ── -->
+  <div class="how-wrap" id="how">
+    <div class="section">
+      <div class="section-tag">Як це працює</div>
+      <h2 class="section-title">Три кроки до початку</h2>
+      <p class="section-sub">Не потрібно завантажувати додаток — все в Telegram, де ви вже є.</p>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-title">Відкрийте бота</div>
+          <div class="step-desc">Перейдіть за посиланням і натисніть «Запустити» — без реєстрації та паролів. Все лишається в Telegram.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-title">Оберіть роль</div>
+          <div class="step-desc">Тренер чи спортсмен — застосунок налаштує інтерфейс і функції під вас.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-title">Починайте тренуватись</div>
+          <div class="step-desc">Створіть першу програму тренувань і починайте тренуватись.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── REVIEWS ── -->
+  <div id="reviews">
+    <div class="section">
+      <div class="reviews-head">
+        <div>
+          <div class="section-tag">Відгуки</div>
+          <h2 class="section-title">Що кажуть користувачі</h2>
+        </div>
+        <div class="reviews-nav">
+          <button type="button" class="reviews-arrow" id="reviewsPrev" aria-label="Попередній відгук">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button type="button" class="reviews-arrow" id="reviewsNext" aria-label="Наступний відгук">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="reviews-track-wrap">
+        <div class="reviews-track" id="reviewsTrack" tabindex="0">
+          <article class="review-card">
+            <span class="review-role">Тренер</span>
+            <p class="review-quote">«Я тренер, більше 20 клієнтів. І схема різна — з кимось 10 тренувань за оплату, з кимось 14. Раніше сама вбивала коли людина почала і коли в неї останнє заняття. Як щось переносиш або відміняєш — уже каша, потім сидиш і рахуєш що в кого лишилось. Календар плюс ексель, на цю рутину йшло по кілька годин. Зараз все в одному місці і за тиждень реально звільняється багато часу.»</p>
+            <div class="review-person">
+              <div class="review-av"><img src="avatars/maya.jpg" alt=""></div>
+              <div>
+                <div class="review-name">maria9812</div>
+              </div>
+            </div>
+          </article>
+          <article class="review-card">
+            <span class="review-role">Тренер</span>
+            <p class="review-quote">«раніше часто писав клієнтам про оплату вже з запізненням. А тут є фішка — застосунок присилає у кого вже скоро закінчиться абонемент. Ну і я вже не пропускаю це.»</p>
+            <div class="review-person">
+              <div class="review-av"><img src="avatars/john.jpg" alt=""></div>
+              <div>
+                <div class="review-name">Serzhik</div>
+              </div>
+            </div>
+          </article>
+          <article class="review-card">
+            <span class="review-role">Тренер</span>
+            <p class="review-quote">«Інколи веду 2-3 клієнтів одночасно. У всіх різні програми, постійно скакав між ними щоб глянути яка вправа далі. Спробував pro view — відкриваю слот і бачу одразу трьох і їх програми на одному екрані. Ну зручно.»</p>
+            <div class="review-person">
+              <div class="review-av"><img src="avatars/igor.jpg" alt=""></div>
+              <div>
+                <div class="review-name">igor_pt</div>
+              </div>
+            </div>
+          </article>
+          <article class="review-card">
+            <span class="review-role">Самостійні тренування</span>
+            <p class="review-quote">«колись все в нотатках вів, зараз користуюсь цім додатком. І круто що в телеграмі — нічого не треба ставити. Також простий і зрозумілий інтерфейс.»</p>
+            <div class="review-person">
+              <div class="review-av"><img src="avatars/andriy.jpg" alt=""></div>
+              <div>
+                <div class="review-name">power_andrew</div>
+              </div>
+            </div>
+          </article>
+          <article class="review-card">
+            <span class="review-role">Клієнт з тренером</span>
+            <p class="review-quote">«Ходжу до тренера. Раніше питала в нього що сьогодні і скільки занять лишилось, зараз просто відкриваю і бачу. Програма під рукою, не треба скріни в чаті шукати.»</p>
+            <div class="review-person">
+              <div class="review-av"><img src="avatars/katya.jpg" alt=""></div>
+              <div>
+                <div class="review-name">katya_k_05</div>
+              </div>
+            </div>
+          </article>
+          <article class="review-card">
+            <span class="review-role">Самостійні тренування</span>
+            <p class="review-quote">«Все під рукою. Щоразу пишу прогрес, і наступного разу як роблю вправу вже бачу вагу і коменти з минулих. Ну і так можу планувати наступні підходи.»</p>
+            <div class="review-person">
+              <div class="review-av"><img src="avatars/dmytro.jpg" alt=""></div>
+              <div>
+                <div class="review-name">oledius__8888</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div class="reviews-dots" id="reviewsDots"></div>
+      <div class="reviews-progress" id="reviewsProgress" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+
+  <!-- ── PRICING ── -->
+  <div id="pricing">
+    <div class="section">
+      <div class="section-tag">Тарифи</div>
+      <h2 class="section-title">Починайте безкоштовно</h2>
+      <p class="section-sub">Усі базові функції — безкоштовні. Застосунком можна користуватись без жодної оплати.</p>
+      <div class="pricing-grid">
+        <div class="plan-card" id="plan-free">
+          <div class="plan-name">FREE</div>
+          <div class="plan-price">0 <span>⭐</span></div>
+          <div class="plan-period">назавжди</div>
+          <div class="plan-tagline">Для сомостійних спортсменів</div>
+          <ul class="plan-features">
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Управління тренувальними програмами</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Перегляд розкладу занять</li>
+          </ul>
+          <div class="plan-tagline">Для тренерів</div>
+          <ul class="plan-features">
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Перегляд розкладу занять</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Створення і редагування тренувальних програм</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Створення і редагування абонементів</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Веденя до 10 клієнтів</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Зручні нагадування</li>
+          </ul>
+          <div class="plan-tagline">Для клієнтів з тренером</div>
+          <ul class="plan-features">
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Підключення до тренера як клієнт</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Перегляд розкладу занять</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Статус абонементу</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Перегляд тренувальної програми</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Режим тренування і історія прогресу</li>
+          </ul>
+          <a href="https://t.me/TheTrainingTrackerBot" class="plan-btn plan-btn-ghost" target="_blank" rel="noopener">Відкрити бота безкоштовно</a>
+        </div>
+        <div class="plan-card highlighted" id="plan-solo">
+          <div class="plan-badge">Для самостійних</div>
+          <div class="plan-name"><span class="accent">SOLO</span></div>
+          <div class="plan-price">99 <span>⭐</span></div>
+          <div class="plan-period">на 30 днів · оплата в боті</div>
+          <div class="plan-tagline">Для самостійних тренувань без тренера</div>
+          <ul class="plan-features">
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Все з FREE</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Режим активного тренування</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Повна історія тренувань для відстеження вашого прогресу</li>
+          </ul>
+          <a href="https://t.me/TheTrainingTrackerBot" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Оплатити SOLO в боті</a>
+        </div>
+        <div class="plan-card highlighted" id="plan-pro">
+          <div class="plan-badge">Для тренерів</div>
+          <div class="plan-name"><span class="accent">PRO</span></div>
+          <div class="plan-price">249 <span>⭐</span></div>
+          <div class="plan-period">на 30 днів · оплата в боті</div>
+          <div class="plan-tagline">Повний інструментарій; клієнти не платять окремо</div>
+          <ul class="plan-features">
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Все з FREE</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Необмежена кількість клієнтів</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Автоподовження абонементів</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Pro View — моніторинг тренувань у реальному часі, зручна робота з декількома клієнтами одночасно</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Історія прогресу клієнтів</li>
+          </ul>
+          <a href="https://t.me/TheTrainingTrackerBot" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Оплатити PRO в боті</a>
+        </div>
+      </div>
+
+      <div class="faq-list" id="faq">
+        <details class="faq-item">
+          <summary>Це окремий додаток?</summary>
+          <p>Ні. Це бот і Mini App у Telegram. Нічого не встановлюєте з App Store чи Google Play.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Хто платить — тренер чи клієнт?</summary>
+          <p>Клієнт з тренером користується FREE і не купує SOLO. Тренер оплачує PRO, якщо потрібні безліміт клієнтів, абонементи й Pro View. Самостійні спортсмени беруть SOLO.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Як оплатити?</summary>
+          <p>Telegram Stars, прямо в боті після відкриття екрана підписки. Ціни на лендингу: SOLO 99⭐ / 30 днів, PRO 199⭐ / 30 днів.</p>
+        </details>
+        <details class="faq-item">
+          <summary>Що з даними, якщо скасувати підписку?</summary>
+          <p>Акаунт лишається. Вимикаються платні функції відповідного тарифу; базовий FREE доступ зберігається.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER CTA ── -->
+  <div class="fcta-wrap">
+    <div class="fcta-glow" aria-hidden="true"></div>
+    <div class="fcta-inner">
+      <h2 class="fcta-title">Тренування, розклад і абонементи<br><span class="accent">вже в Telegram</span></h2>
+      <p class="fcta-sub">Безкоштовний старт, без реєстрації.</p>
+      <a href="https://t.me/TheTrainingTrackerBot" class="btn btn-primary" target="_blank" rel="noopener" style="font-size:16px;padding:16px 36px;border-radius:14px;margin:0 auto;min-height:56px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        Відкрити в Telegram
+      </a>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <a href="#" class="footer-brand">
+      <div class="footer-logo"><img src="logo.jpeg" alt="Training Tracker"></div>
+      <span class="footer-name">Training Tracker</span>
+    </a>
+    <span class="footer-copy">© 2026 Training Tracker. Всі права захищено.</span>
+  </footer>
+
+  <script>
+    (function () {
+      var track = document.getElementById('reviewsTrack');
+      var prev = document.getElementById('reviewsPrev');
+      var next = document.getElementById('reviewsNext');
+      var dotsWrap = document.getElementById('reviewsDots');
+      if (!track || !prev || !next || !dotsWrap) return;
+
+      var SPEED = 32;
+      var RESUME_MS = 1800;
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var originals = Array.prototype.slice.call(track.querySelectorAll('.review-card'));
+      var count = originals.length;
+      if (!count) return;
+      originals.forEach(function (card) {
+        var clone = card.cloneNode(true);
+        clone.classList.add('is-clone');
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+      });
+
+      var dots = originals.map(function (_, i) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'scroll-dot' + (i === 0 ? ' active' : '');
+        b.setAttribute('aria-label', 'Відгук ' + (i + 1));
+        b.addEventListener('click', function () { jumpTo(i); });
+        dotsWrap.appendChild(b);
+        return b;
+      });
+
+      var interacting = false;
+      var resumeTimer = null;
+      var lastTs = 0;
+
+      function loopWidth() {
+        var firstClone = track.querySelector('.review-card.is-clone');
+        return firstClone ? firstClone.offsetLeft : track.scrollWidth / 2;
+      }
+      function step() {
+        var styles = window.getComputedStyle(track);
+        var gap = parseFloat(styles.columnGap || styles.gap) || 14;
+        return originals[0].getBoundingClientRect().width + gap;
+      }
+      function wrapScroll() {
+        var w = loopWidth();
+        if (!w) return;
+        if (track.scrollLeft >= w) track.scrollLeft -= w;
+        if (track.scrollLeft < 0) track.scrollLeft += w;
+      }
+      function currentIndex() {
+        var s = step();
+        if (!s) return 0;
+        var i = Math.round(track.scrollLeft / s) % count;
+        return i < 0 ? i + count : i;
+      }
+      function updateDots() {
+        var idx = currentIndex();
+        dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
+      }
+      function setMarquee(on) {
+        track.classList.toggle('is-marquee', on && !reduceMotion);
+      }
+      function pause() {
+        interacting = true;
+        setMarquee(false);
+        if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
+      }
+      function scheduleResume() {
+        interacting = false;
+        if (resumeTimer) clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(function () {
+          resumeTimer = null;
+          if (!document.hidden && !reduceMotion) setMarquee(true);
+        }, RESUME_MS);
+      }
+      function jumpTo(i) {
+        pause();
+        track.scrollTo({ left: ((i % count) + count) % count * step(), behavior: reduceMotion ? 'auto' : 'smooth' });
+        scheduleResume();
+      }
+      function tick(ts) {
+        requestAnimationFrame(tick);
+        if (!lastTs) lastTs = ts;
+        var dt = Math.min(40, ts - lastTs);
+        lastTs = ts;
+        wrapScroll();
+        updateDots();
+        if (reduceMotion || interacting || document.hidden || !track.classList.contains('is-marquee')) return;
+        track.scrollLeft += SPEED * dt / 1000;
+      }
+
+      track.addEventListener('pointerdown', pause, { passive: true });
+      track.addEventListener('pointerup', scheduleResume, { passive: true });
+      track.addEventListener('pointercancel', scheduleResume, { passive: true });
+      track.addEventListener('mouseenter', pause);
+      track.addEventListener('mouseleave', scheduleResume);
+      prev.addEventListener('click', function () { jumpTo(currentIndex() - 1); });
+      next.addEventListener('click', function () { jumpTo(currentIndex() + 1); });
+      track.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); }
+      });
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) setMarquee(false);
+        else if (!interacting && !reduceMotion) setMarquee(true);
+      });
+
+      if (!reduceMotion) setMarquee(true);
+      requestAnimationFrame(tick);
+    })();
+
+    (function () {
+      var wrap = document.getElementById('phonesScroll');
+      var dots = document.querySelectorAll('#phoneDots .scroll-dot');
+      if (!wrap || !dots.length) return;
+      var count = dots.length;
+
+      function updateDots() {
+        var idx = Math.min(count - 1, Math.round(wrap.scrollLeft / (wrap.scrollWidth / count)));
+        dots.forEach(function (d, i) { d.classList.toggle('active', i === idx); });
+      }
+
+      wrap.addEventListener('scroll', updateDots, { passive: true });
+
+      dots.forEach(function (dot) {
+        dot.addEventListener('click', function () {
+          var idx = parseInt(dot.dataset.index, 10);
+          wrap.scrollTo({ left: idx * (wrap.scrollWidth / count), behavior: 'smooth' });
+        });
+      });
+    })();
+
+    (function () {
+      var pills = document.querySelectorAll('.feat-pill');
+      var cards = document.querySelectorAll('.feat-card[data-roles]');
+      function apply(filter) {
+        pills.forEach(function (p) { p.classList.toggle('on', p.getAttribute('data-filter') === filter); });
+        cards.forEach(function (c) {
+          var roles = (c.getAttribute('data-roles') || '').split(/\s+/);
+          c.classList.toggle('is-hidden', filter !== 'all' && roles.indexOf(filter) === -1);
+        });
+      }
+      pills.forEach(function (p) {
+        p.addEventListener('click', function () { apply(p.getAttribute('data-filter')); });
+      });
+      document.querySelectorAll('.aud-card[data-filter]').forEach(function (a) {
+        a.addEventListener('click', function () {
+          var f = a.getAttribute('data-filter');
+          if (f) apply(f);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
