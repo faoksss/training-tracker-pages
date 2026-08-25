@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Training Tracker — клієнти, розклад і абонементи в Telegram</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="shortcut icon" href="logo.jpeg">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap');
 
@@ -238,12 +241,6 @@
       line-height: 1.45;
     }
 
-    @keyframes hero-float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
-    .hero-ph-front { animation: hero-float 6s ease-in-out infinite; }
-
     .hero-phone-wrap {
       display: flex;
       justify-content: center;
@@ -258,50 +255,38 @@
       flex-shrink: 0;
     }
 
-    .hero-phones .ph-frame { position: absolute; }
+    .hero-phones .ph-frame {
+      position: absolute;
+      width: 228px;
+      left: 50%;
+      top: 20px;
+      margin-left: -114px;
+      transform-origin: center center;
+      transition:
+        transform 1.2s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .hero-phones .ph-screen { height: 438px; }
+    .hero-phones .tgb { height: 34px; padding: 0 10px; }
+    .hero-phones .tgb-av { width: 19px; height: 19px; }
+    .hero-phones .pnav { padding: 5px 0 4px; }
+    .hero-phones .pnt-label { font-size: 6px; font-weight: 600; }
 
     .hero-ph-left {
-      width: 196px;
-      left: 0;
-      top: 48px;
-      transform: perspective(900px) rotateY(7deg);
-      opacity: 0.84;
+      transform: translate(-142px, 0) scale(0.84);
+      opacity: 0.78;
       z-index: 1;
     }
     .hero-ph-right {
-      width: 196px;
-      left: 292px;
-      top: 48px;
-      transform: perspective(900px) rotateY(-7deg);
-      opacity: 0.84;
+      transform: translate(142px, 0) scale(0.84);
+      opacity: 0.78;
       z-index: 1;
     }
-    .hero-ph-left .ph-screen,
-    .hero-ph-right .ph-screen { height: 378px; }
-    .hero-ph-left .tgb,
-    .hero-ph-right .tgb { height: 28px; padding: 0 8px; }
-    .hero-ph-left .tgb-av,
-    .hero-ph-right .tgb-av { width: 15px; height: 15px; }
-    .hero-ph-left .pnav,
-    .hero-ph-right .pnav { padding: 4px 0 3px; }
-    .hero-ph-left .pnt-label,
-    .hero-ph-right .pnt-label { font-size: 5.5px; font-weight: 600; }
-
     .hero-ph-front {
-      width: 228px;
-      left: 148px;
-      top: 14px;
-      z-index: 3;
-      box-shadow:
-        0 20px 60px rgba(0,0,0,0.6),
-        0 6px 20px rgba(0,100,160,0.24),
-        0 0 48px rgba(0,136,204,0.14);
+      transform: translate(0, 0) scale(1);
+      opacity: 1;
+      z-index: 4;
     }
-    .hero-ph-front .ph-screen { height: 438px; }
-    .hero-ph-front .tgb { height: 34px; padding: 0 10px; }
-    .hero-ph-front .tgb-av { width: 19px; height: 19px; }
-    .hero-ph-front .pnav { padding: 5px 0 4px; }
-    .hero-ph-front .pnt-label { font-size: 6px; font-weight: 600; }
 
     /* ── PHONE MOCKUP (shared) ── */
     .ph-frame {
@@ -889,7 +874,7 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 14px;
       margin-top: 28px;
-      align-items: start;
+      align-items: stretch;
     }
 
     .plan-card {
@@ -898,6 +883,9 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
     .plan-card.highlighted {
       background: rgba(0,136,204,0.08);
@@ -939,6 +927,7 @@
     }
     .plan-price span { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 600; color: var(--text-muted); }
     .plan-period { font-size: 12px; color: var(--text-faint); margin-bottom: 20px; }
+    .plan-usd { font-size: 12px; color: var(--text-muted); margin-top: -14px; margin-bottom: 16px; }
 
     .plan-features {
       list-style: none;
@@ -980,6 +969,7 @@
       transition: opacity 0.15s, transform 0.15s;
       min-height: 44px;
       line-height: 1.4;
+      margin-top: auto;
     }
     .plan-btn:hover { opacity: 0.85; transform: translateY(-1px); }
     .plan-btn-primary { background: var(--brand); color: #fff; }
@@ -1063,11 +1053,9 @@
       .hero-note { margin-left: auto; margin-right: auto; max-width: 420px; }
       .hero-phone-wrap {
         margin-top: 8px;
-        overflow-x: auto;
-        overflow-y: visible;
+        overflow: visible;
         width: 100%;
-        -webkit-overflow-scrolling: touch;
-        justify-content: flex-start;
+        justify-content: center;
       }
       .hero-phones {
         width: 540px;
@@ -1131,10 +1119,14 @@
         transform: scale(calc((100vw - 32px) / 540));
         transform-origin: top center;
         height: calc(500px * (100vw - 32px) / 540);
-        margin-left: auto;
-        margin-right: auto;
+        margin: 0 auto;
       }
-      .hero-phone-wrap { overflow: visible; }
+      .hero-phone-wrap {
+        overflow: visible;
+        justify-content: center;
+      }
+      .hero-ph-left { transform: translate(-118px, 0) scale(0.84); }
+      .hero-ph-right { transform: translate(118px, 0) scale(0.84); }
 
       .step:not(:last-child)::after {
         display: block;
@@ -1177,7 +1169,7 @@
       .hero-h1 { font-size: 28px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .hero-ph-front { animation: none; }
+      .hero-phones .ph-frame { transition: none; }
       .reviews-track { scroll-behavior: auto; }
       .reviews-progress { display: none; }
     }
@@ -1234,12 +1226,12 @@
         <!-- LEFT: Schedule -->
         <div class="ph-frame hero-ph-left">
           <div class="ph-screen">
-            <div class="tgb" style="height:28px;padding:0 8px">
+            <div class="tgb">
               <div class="tgb-icon" style="color:rgba(255,255,255,0.6)">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
               </div>
               <div class="tgb-center">
-                <div class="tgb-av" style="width:15px;height:15px"><img src="logo.jpeg" alt=""></div>
+                <div class="tgb-av"><img src="logo.jpeg" alt=""></div>
                 <span style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
               </div>
               <span class="tgb-dots" style="font-size:9px">···</span>
@@ -1300,10 +1292,10 @@
         <!-- CENTER: Dashboard -->
         <div class="ph-frame hero-ph-front">
           <div class="ph-screen">
-            <div class="tgb" style="height:34px;padding:0 8px">
+            <div class="tgb">
               <span style="font-size:15px;color:rgba(255,255,255,0.55);line-height:1">×</span>
               <div class="tgb-center">
-                <div class="tgb-av" style="width:19px;height:19px"><img src="logo.jpeg" alt=""></div>
+                <div class="tgb-av"><img src="logo.jpeg" alt=""></div>
                 <span style="font-size:7.5px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
               </div>
               <span class="tgb-dots" style="font-size:9px">···</span>
@@ -1398,12 +1390,12 @@
         <!-- RIGHT: Workout -->
         <div class="ph-frame hero-ph-right">
           <div class="ph-screen">
-            <div class="tgb" style="height:28px;padding:0 8px">
+            <div class="tgb">
               <div class="tgb-icon" style="color:rgba(255,255,255,0.6)">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
               </div>
               <div class="tgb-center">
-                <div class="tgb-av" style="width:15px;height:15px"><img src="logo.jpeg" alt=""></div>
+                <div class="tgb-av"><img src="logo.jpeg" alt=""></div>
                 <span style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
               </div>
               <span class="tgb-dots" style="font-size:9px">···</span>
@@ -1655,12 +1647,14 @@
       <div class="section-tag">Тарифи</div>
       <h2 class="section-title">Починайте безкоштовно</h2>
       <p class="section-sub">Усі базові функції — безкоштовні. Застосунком можна користуватись без жодної оплати.</p>
+      <p class="section-sub">SOLO і PRO списуються через Telegram Stars, прямо в боті — без картки на сайті. Орієнтовно 99⭐ ≈ 2,4 USD, 249⭐ ≈ 6,1 USD.</p>
       <div class="pricing-grid">
-        <div class="plan-card" id="plan-free">
-          <div class="plan-name">FREE</div>
+        <div class="plan-card highlighted" id="plan-free">
+          <div class="plan-badge">Безкоштовно</div>
+          <div class="plan-name"><span class="accent">FREE</span></div>
           <div class="plan-price">0 <span>⭐</span></div>
           <div class="plan-period">назавжди</div>
-          <div class="plan-tagline">Для сомостійних спортсменів</div>
+          <div class="plan-tagline">Для самостійних спортсменів</div>
           <ul class="plan-features">
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Управління тренувальними програмами</li>
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Перегляд розкладу занять</li>
@@ -1670,7 +1664,7 @@
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Перегляд розкладу занять</li>
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Створення і редагування тренувальних програм</li>
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Створення і редагування абонементів</li>
-            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Веденя до 10 клієнтів</li>
+            <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Ведення до 10 клієнтів</li>
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Зручні нагадування</li>
           </ul>
           <div class="plan-tagline">Для клієнтів з тренером</div>
@@ -1681,13 +1675,14 @@
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Перегляд тренувальної програми</li>
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Режим тренування і історія прогресу</li>
           </ul>
-          <a href="https://t.me/TheTrainingTrackerBot" class="plan-btn plan-btn-ghost" target="_blank" rel="noopener">Відкрити бота безкоштовно</a>
+          <a href="https://t.me/TheTrainingTrackerBot" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Відкрити бота безкоштовно</a>
         </div>
         <div class="plan-card highlighted" id="plan-solo">
           <div class="plan-badge">Для самостійних</div>
           <div class="plan-name"><span class="accent">SOLO</span></div>
           <div class="plan-price">99 <span>⭐</span></div>
           <div class="plan-period">на 30 днів · оплата в боті</div>
+          <div class="plan-usd">близько 2,4 USD</div>
           <div class="plan-tagline">Для самостійних тренувань без тренера</div>
           <ul class="plan-features">
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Все з FREE</li>
@@ -1699,8 +1694,9 @@
         <div class="plan-card highlighted" id="plan-pro">
           <div class="plan-badge">Для тренерів</div>
           <div class="plan-name"><span class="accent">PRO</span></div>
-          <div class="plan-price">249 <span>⭐</span></div>
+          <div class="plan-price">250 <span>⭐</span></div>
           <div class="plan-period">на 30 днів · оплата в боті</div>
+          <div class="plan-usd">близько 6,1 USD</div>
           <div class="plan-tagline">Повний інструментарій; клієнти не платять окремо</div>
           <ul class="plan-features">
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Все з FREE</li>
@@ -1738,6 +1734,36 @@
   </footer>
 
   <script>
+    (function () {
+      var stage = document.querySelector('.hero-phones');
+      if (!stage) return;
+      var slots = ['hero-ph-left', 'hero-ph-front', 'hero-ph-right'];
+      var phones = Array.prototype.slice.call(stage.querySelectorAll('.ph-frame'));
+      if (phones.length !== 3) return;
+      var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) return;
+      var paused = false;
+      var busy = false;
+      var MOVE_MS = 1200;
+      var HOLD_MS = 2800;
+
+      function step() {
+        if (paused || busy || document.hidden) return;
+        busy = true;
+        phones.unshift(phones.pop());
+        phones.forEach(function (el, i) {
+          el.classList.remove('hero-ph-left', 'hero-ph-front', 'hero-ph-right');
+          el.classList.add(slots[i]);
+        });
+        window.setTimeout(function () { busy = false; }, MOVE_MS);
+      }
+
+      var timer = window.setInterval(step, MOVE_MS + HOLD_MS);
+      stage.addEventListener('mouseenter', function () { paused = true; });
+      stage.addEventListener('mouseleave', function () { paused = false; });
+      window.addEventListener('pagehide', function () { window.clearInterval(timer); });
+    })();
+
     (function () {
       var track = document.getElementById('reviewsTrack');
       var prev = document.getElementById('reviewsPrev');
