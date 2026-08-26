@@ -7,6 +7,33 @@
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="shortcut icon" href="logo.jpeg">
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '926843887151202');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=926843887151202&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
+  <!-- PostHog -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}p||((p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",p.onerror=function(){p=null},(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r));var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Oo Lo $o init rl nl tl el ll pa il hl Ko capture sl Ao gl calculateEventProperties pl register register_once register_for_session unregister unregister_for_session Xo ml getFeatureFlag getFeatureFlagPayload getFeatureFlagResult getAllFeatureFlags isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync wl identify setPersonProperties unsetPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset kl shutdown setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty yl cl createPersonProfile setInternalOrTestUser bl Do No opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing dl debug ma kn getPageViewId captureTraceFeedback captureTraceMetric Go".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_o2ccSiB5HsbdaZcHUmhN8KixGukH3Lgf3JusZLbgTfAd', {
+        api_host: 'https://eu.i.posthog.com',
+        defaults: '2026-05-30',
+        person_profiles: 'identified_only',
+    })
+  </script>
+  <!-- End PostHog -->
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap');
 
@@ -1188,12 +1215,12 @@
       <a href="#reviews" class="nav-link">Відгуки</a>
       <a href="#pricing" class="nav-link">Тарифи</a>
       <a href="#faq" class="nav-link">Питання</a>
-      <a href="https://t.me/TheTrainingTrackerBot" class="btn btn-primary nav-cta" target="_blank" rel="noopener">Відкрити в Telegram</a>
+      <a href="https://t.me/TheTrainingTrackerBot?start=promo_lndng_nav" class="btn btn-primary nav-cta" target="_blank" rel="noopener">Відкрити в Telegram</a>
     </div>
   </nav>
 
   <!-- ── HERO ── -->
-  <div class="hero-wrap">
+  <div class="hero-wrap" id="hero">
     <div class="hero-glow-tr" aria-hidden="true"></div>
     <div class="hero-glow-bl" aria-hidden="true"></div>
     <div class="hero-grid" aria-hidden="true"></div>
@@ -1208,7 +1235,7 @@
           Training Tracker — бот у Telegram для тренерів і спортсменів. Без окремого застосунку й без реєстрації: відкрили бота і працюєте.
         </p>
         <div class="hero-actions">
-          <a href="https://t.me/TheTrainingTrackerBot" class="btn btn-primary" target="_blank" rel="noopener">
+          <a href="https://t.me/TheTrainingTrackerBot?start=promo_lndng_hero" class="btn btn-primary" target="_blank" rel="noopener">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
             </svg>
@@ -1675,7 +1702,7 @@
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Перегляд тренувальної програми</li>
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Режим тренування і історія прогресу</li>
           </ul>
-          <a href="https://t.me/TheTrainingTrackerBot" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Відкрити бота безкоштовно</a>
+          <a href="https://t.me/TheTrainingTrackerBot?start=promo_lndng_free" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Відкрити бота безкоштовно</a>
         </div>
         <div class="plan-card highlighted" id="plan-solo">
           <div class="plan-badge">Для самостійних</div>
@@ -1689,7 +1716,7 @@
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Режим активного тренування</li>
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Повна історія тренувань для відстеження вашого прогресу</li>
           </ul>
-          <a href="https://t.me/TheTrainingTrackerBot" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Оплатити SOLO в боті</a>
+          <a href="https://t.me/TheTrainingTrackerBot?start=promo_lndng_solo" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Оплатити SOLO в боті</a>
         </div>
         <div class="plan-card highlighted" id="plan-pro">
           <div class="plan-badge">Для тренерів</div>
@@ -1705,17 +1732,17 @@
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Pro View — моніторинг тренувань у реальному часі, зручна робота з декількома клієнтами одночасно</li>
             <li><span class="plan-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>Історія прогресу клієнтів</li>
           </ul>
-          <a href="https://t.me/TheTrainingTrackerBot" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Оплатити PRO в боті</a>
+          <a href="https://t.me/TheTrainingTrackerBot?start=promo_lndng_pro" class="plan-btn plan-btn-primary" target="_blank" rel="noopener">Оплатити PRO в боті</a>
         </div>
       </div>
 
   <!-- ── FOOTER CTA ── -->
-  <div class="fcta-wrap">
+  <div class="fcta-wrap" id="cta">
     <div class="fcta-glow" aria-hidden="true"></div>
     <div class="fcta-inner">
       <h2 class="fcta-title">Тренування, розклад і абонементи<br><span class="accent">вже в Telegram</span></h2>
       <p class="fcta-sub">Безкоштовний старт, без реєстрації.</p>
-      <a href="https://t.me/TheTrainingTrackerBot" class="btn btn-primary" target="_blank" rel="noopener" style="font-size:16px;padding:16px 36px;border-radius:14px;margin:0 auto;min-height:56px">
+      <a href="https://t.me/TheTrainingTrackerBot?start=promo_lndng_footer" class="btn btn-primary" target="_blank" rel="noopener" style="font-size:16px;padding:16px 36px;border-radius:14px;margin:0 auto;min-height:56px">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
         </svg>
@@ -1913,6 +1940,151 @@
         a.addEventListener('click', function () {
           var f = a.getAttribute('data-filter');
           if (f) apply(f);
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href*="t.me/TheTrainingTrackerBot"]');
+      if (!a) return;
+
+      var location = 'other';
+      if (a.classList.contains('nav-cta')) location = 'nav';
+      else if (a.closest('#plan-free')) location = 'pricing_free';
+      else if (a.closest('#plan-solo')) location = 'pricing_solo';
+      else if (a.closest('#plan-pro')) location = 'pricing_pro';
+      else if (a.closest('.fcta-wrap')) location = 'footer';
+      else if (a.closest('.hero-wrap')) location = 'hero';
+
+      if (typeof fbq === 'function') {
+        fbq('track', 'Lead', {
+          content_name: 'open_telegram',
+          content_category: location
+        });
+      }
+      if (typeof posthog !== 'undefined' && typeof posthog.capture === 'function') {
+        posthog.capture('open_telegram', { location: location });
+      }
+    });
+  </script>
+
+  <script>
+    (function () {
+      if (!('IntersectionObserver' in window)) return;
+
+      var ENGAGE_MS = 5000;
+      var SECTION_IDS = ['hero', 'audience', 'how', 'reviews', 'pricing', 'cta'];
+      var state = {};
+
+      function capture(event, props) {
+        if (typeof posthog !== 'undefined' && typeof posthog.capture === 'function') {
+          posthog.capture(event, props);
+        }
+      }
+
+      function visibleMs(s) {
+        return s.accumulatedMs + (s.enteredAt != null ? Date.now() - s.enteredAt : 0);
+      }
+
+      function pauseTimers() {
+        Object.keys(state).forEach(function (id) {
+          var s = state[id];
+          if (s.visible && s.enteredAt != null) {
+            s.accumulatedMs += Date.now() - s.enteredAt;
+            s.enteredAt = null;
+          }
+        });
+      }
+
+      function resumeTimers() {
+        Object.keys(state).forEach(function (id) {
+          var s = state[id];
+          if (s.visible && s.enteredAt == null) {
+            s.enteredAt = Date.now();
+          }
+        });
+      }
+
+      function flushLeave(id) {
+        var s = state[id];
+        if (s.enteredAt != null) {
+          s.accumulatedMs += Date.now() - s.enteredAt;
+          s.enteredAt = null;
+        }
+        var seconds = Math.round(s.accumulatedMs / 1000);
+        if (seconds >= 1) {
+          capture('section_time', { section: id, seconds: seconds });
+        }
+        s.accumulatedMs = 0;
+      }
+
+      function maybeEngage(id) {
+        var s = state[id];
+        if (s.engaged || document.hidden) return;
+        if (visibleMs(s) >= ENGAGE_MS) {
+          s.engaged = true;
+          capture('section_engaged', {
+            section: id,
+            threshold_seconds: ENGAGE_MS / 1000
+          });
+        }
+      }
+
+      SECTION_IDS.forEach(function (id) {
+        state[id] = {
+          visible: false,
+          enteredAt: null,
+          accumulatedMs: 0,
+          viewed: false,
+          engaged: false
+        };
+      });
+
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var id = entry.target.id;
+          var s = state[id];
+          if (!s) return;
+
+          if (entry.isIntersecting) {
+            s.visible = true;
+            if (s.enteredAt == null && !document.hidden) {
+              s.enteredAt = Date.now();
+            }
+            if (!s.viewed) {
+              s.viewed = true;
+              capture('section_view', { section: id });
+            }
+          } else if (s.visible) {
+            s.visible = false;
+            flushLeave(id);
+          }
+        });
+      }, { threshold: 0.4 });
+
+      SECTION_IDS.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) observer.observe(el);
+      });
+
+      setInterval(function () {
+        if (document.hidden) return;
+        SECTION_IDS.forEach(maybeEngage);
+      }, 1000);
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) pauseTimers();
+        else resumeTimers();
+      });
+
+      window.addEventListener('pagehide', function () {
+        SECTION_IDS.forEach(function (id) {
+          if (state[id].visible) {
+            state[id].visible = false;
+            flushLeave(id);
+          }
         });
       });
     })();
