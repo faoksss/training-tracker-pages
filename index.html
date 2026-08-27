@@ -4,39 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Training Tracker — клієнти, розклад і абонементи в Telegram</title>
+  <meta name="description" content="Training Tracker — бот у Telegram для тренерів і спортсменів. Тренування, розклад і абонементи в одному місці без окремого застосунку та реєстрації.">
+  <link rel="canonical" href="https://landing.training-tracker.fks-systems.com/">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
-  <link rel="shortcut icon" href="logo.jpeg">
-  <!-- Meta Pixel Code -->
+  <link rel="shortcut icon" href="favicon-32.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap">
+  </noscript>
+  <!-- Meta Pixel stub (script deferred until idle) -->
   <script>
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
   n.callMethod.apply(n,arguments):n.queue.push(arguments)};
   if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
+  n.queue=[];}(window, document);
   fbq('init', '926843887151202');
   fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
   src="https://www.facebook.com/tr?id=926843887151202&ev=PageView&noscript=1"
+  alt=""
   /></noscript>
   <!-- End Meta Pixel Code -->
-  <!-- PostHog -->
   <script>
-    !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}p||((p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",p.onerror=function(){p=null},(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r));var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Oo Lo $o init rl nl tl el ll pa il hl Ko capture sl Ao gl calculateEventProperties pl register register_once register_for_session unregister unregister_for_session Xo ml getFeatureFlag getFeatureFlagPayload getFeatureFlagResult getAllFeatureFlags isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync wl identify setPersonProperties unsetPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset kl shutdown setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty yl cl createPersonProfile setInternalOrTestUser bl Do No opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing dl debug ma kn getPageViewId captureTraceFeedback captureTraceMetric Go".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
-    posthog.init('phc_o2ccSiB5HsbdaZcHUmhN8KixGukH3Lgf3JusZLbgTfAd', {
-        api_host: 'https://eu.i.posthog.com',
-        defaults: '2026-05-30',
-        person_profiles: 'identified_only',
-    })
+    window.posthog = window.posthog || {
+      _q: [],
+      capture: function () { this._q.push({ m: 'capture', a: [].slice.call(arguments) }); },
+      register: function () { this._q.push({ m: 'register', a: [].slice.call(arguments) }); }
+    };
   </script>
-  <!-- End PostHog -->
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Unbounded:wght@700;800&display=swap');
-
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
@@ -46,10 +48,11 @@
       --border:       rgba(255,255,255,0.1);
       --border-brand: rgba(0,136,204,0.35);
       --brand:        #0088cc;
+      --brand-btn:    #006a9e;
       --brand-alt:    #5eb8e8;
       --text:         #fff;
       --text-muted:   rgba(255,255,255,0.55);
-      --text-faint:   rgba(255,255,255,0.38);
+      --text-faint:   rgba(255,255,255,0.55);
       --radius:       16px;
       --nav-h:        60px;
     }
@@ -126,7 +129,7 @@
       min-height: 48px;
     }
     .btn:hover { opacity: 0.88; transform: translateY(-1px); }
-    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-primary { background: var(--brand-btn); color: #fff; }
     .btn-ghost {
       background: transparent;
       color: var(--text-muted);
@@ -429,7 +432,7 @@
     .mock-sub {
       font-size: 7px;
       font-weight: 500;
-      color: rgba(255,255,255,0.55);
+      color: rgba(255,255,255,0.68);
       line-height: 1.35;
     }
     .mock-seg { display: flex; gap: 4px; }
@@ -460,7 +463,7 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      color: rgba(255,255,255,0.38);
+      color: rgba(255,255,255,0.6);
     }
     .mock-name { font-size: 8px; font-weight: 600; color: #fff; }
     .mock-meta { font-size: 6.5px; color: rgba(255,255,255,0.55); display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
@@ -925,7 +928,7 @@
       top: -12px;
       left: 50%;
       transform: translateX(-50%);
-      background: var(--brand);
+      background: var(--brand-btn);
       color: #fff;
       font-size: 11px;
       font-weight: 800;
@@ -999,7 +1002,7 @@
       margin-top: auto;
     }
     .plan-btn:hover { opacity: 0.85; transform: translateY(-1px); }
-    .plan-btn-primary { background: var(--brand); color: #fff; }
+    .plan-btn-primary { background: var(--brand-btn); color: #fff; }
     .plan-btn-ghost { background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid var(--border); }
 
     /* ── FOOTER CTA ── */
@@ -1169,21 +1172,31 @@
     .scroll-dots {
       display: none;
       justify-content: center;
-      gap: 6px;
+      gap: 2px;
       padding: 4px 0 8px;
     }
     .scroll-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .scroll-dot::before {
+      content: '';
       width: 6px;
       height: 6px;
       border-radius: 3px;
       background: rgba(255,255,255,0.2);
-      border: none;
-      cursor: pointer;
-      padding: 0;
       transition: background 0.2s, width 0.2s;
-      flex-shrink: 0;
     }
-    .scroll-dot.active {
+    .scroll-dot.active::before {
       background: var(--brand);
       width: 18px;
     }
@@ -1207,7 +1220,7 @@
   <!-- ── NAV ── -->
   <nav>
     <a href="#" class="nav-brand">
-      <div class="nav-logo"><img src="logo.jpeg" alt="Training Tracker"></div>
+      <div class="nav-logo"><img src="logo-128.jpeg" width="34" height="34" alt="Training Tracker"></div>
       <span class="nav-name">Training Tracker</span>
     </a>
     <div class="nav-links">
@@ -1219,6 +1232,7 @@
     </div>
   </nav>
 
+  <main>
   <!-- ── HERO ── -->
   <div class="hero-wrap" id="hero">
     <div class="hero-glow-tr" aria-hidden="true"></div>
@@ -1258,7 +1272,7 @@
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
               </div>
               <div class="tgb-center">
-                <div class="tgb-av"><img src="logo.jpeg" alt=""></div>
+                <div class="tgb-av"><img src="logo-64.jpeg" width="19" height="19" alt=""></div>
                 <span style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
               </div>
               <span class="tgb-dots" style="font-size:9px">···</span>
@@ -1322,7 +1336,7 @@
             <div class="tgb">
               <span style="font-size:15px;color:rgba(255,255,255,0.55);line-height:1">×</span>
               <div class="tgb-center">
-                <div class="tgb-av"><img src="logo.jpeg" alt=""></div>
+                <div class="tgb-av"><img src="logo-64.jpeg" width="19" height="19" alt=""></div>
                 <span style="font-size:7.5px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
               </div>
               <span class="tgb-dots" style="font-size:9px">···</span>
@@ -1356,7 +1370,7 @@
               <div style="border-radius:12px;padding:6px 8px;display:flex;align-items:center;gap:6px;background:rgba(255,149,0,0.12);border:1px solid rgba(255,149,0,0.3)">
                 <div style="width:20px;height:20px;border-radius:8px;background:rgba(255,149,0,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0">⚡</div>
                 <div style="flex:1;min-width:0">
-                  <div style="font-size:7px;font-weight:700;color:#d97706;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">2 абонементи готові до завершення</div>
+                  <div style="font-size:7px;font-weight:700;color:#fbbf24;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">2 абонементи готові до завершення</div>
                   <div style="font-size:6px;color:rgba(255,255,255,0.6);line-height:1.3;margin-top:1px;white-space:nowrap;overflow:hidden">Натисніть, щоб переглянути та завершити</div>
                 </div>
               </div>
@@ -1422,7 +1436,7 @@
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
               </div>
               <div class="tgb-center">
-                <div class="tgb-av"><img src="logo.jpeg" alt=""></div>
+                <div class="tgb-av"><img src="logo-64.jpeg" width="19" height="19" alt=""></div>
                 <span style="font-size:7px;font-weight:600;color:rgba(255,255,255,0.88)">Training Tracker Bot</span>
               </div>
               <span class="tgb-dots" style="font-size:9px">···</span>
@@ -1480,7 +1494,7 @@
                     </div>
                   </div>
                 </div>
-                <div style="margin-top:6px;border:1.5px dashed rgba(255,255,255,0.18);border-radius:8px;padding:5px;text-align:center;font-size:6.5px;font-weight:600;color:rgba(255,255,255,0.4)">Додати підхід</div>
+                <div style="margin-top:6px;border:1.5px dashed rgba(255,255,255,0.25);border-radius:8px;padding:5px;text-align:center;font-size:6.5px;font-weight:600;color:rgba(255,255,255,0.65)">Додати підхід</div>
               </div>
             </div>
             <div class="pnav" style="padding:4px 0 3px">
@@ -1605,7 +1619,7 @@
             <span class="review-role">Тренер</span>
             <p class="review-quote">«Я тренер, більше 20 клієнтів. І схема різна — з кимось 10 тренувань за оплату, з кимось 14. Раніше сама вбивала, коли людина почала і коли в неї останнє заняття. Якщо щось переносиш або відміняєш — уже каша, потім сидиш і рахуєш, що в кого лишилось. Календар плюс Excel, на цю рутину йшло по кілька годин. Зараз все в одному місці і за тиждень реально звільняється багато часу.»</p>
             <div class="review-person">
-              <div class="review-av"><img src="avatars/maya.jpg" alt=""></div>
+              <div class="review-av"><img src="avatars/maya.jpg" width="40" height="40" loading="lazy" decoding="async" alt=""></div>
               <div>
                 <div class="review-name">maria9812</div>
               </div>
@@ -1615,7 +1629,7 @@
             <span class="review-role">Тренер</span>
             <p class="review-quote">«Раніше часто писав клієнтам про оплату вже із запізненням. А тут є фішка — застосунок присилає, у кого вже скоро закінчиться абонемент. Ну і я вже не пропускаю це.»</p>
             <div class="review-person">
-              <div class="review-av"><img src="avatars/john.jpg" alt=""></div>
+              <div class="review-av"><img src="avatars/john.jpg" width="40" height="40" loading="lazy" decoding="async" alt=""></div>
               <div>
                 <div class="review-name">Serzhik</div>
               </div>
@@ -1625,7 +1639,7 @@
             <span class="review-role">Тренер</span>
             <p class="review-quote">«Інколи веду 2-3 клієнтів одночасно. У всіх різні програми, постійно скакав між ними, щоб глянути, яка вправа далі. Спробував Pro View — відкриваю слот і бачу одразу трьох і їхні програми на одному екрані. Ну зручно.»</p>
             <div class="review-person">
-              <div class="review-av"><img src="avatars/igor.jpg" alt=""></div>
+              <div class="review-av"><img src="avatars/igor.jpg" width="40" height="40" loading="lazy" decoding="async" alt=""></div>
               <div>
                 <div class="review-name">igor_pt</div>
               </div>
@@ -1635,7 +1649,7 @@
             <span class="review-role">Самостійні тренування</span>
             <p class="review-quote">«Колись все в нотатках вів, зараз користуюсь цим застосунком. І круто, що в Telegram — нічого не треба ставити. Також простий і зрозумілий інтерфейс.»</p>
             <div class="review-person">
-              <div class="review-av"><img src="avatars/andriy.jpg" alt=""></div>
+              <div class="review-av"><img src="avatars/andriy.jpg" width="40" height="40" loading="lazy" decoding="async" alt=""></div>
               <div>
                 <div class="review-name">power_andrew</div>
               </div>
@@ -1645,7 +1659,7 @@
             <span class="review-role">Клієнт з тренером</span>
             <p class="review-quote">«Ходжу до тренера. Раніше питала в нього, що сьогодні і скільки занять лишилось, зараз просто відкриваю і бачу. Програма під рукою, не треба скріни в чаті шукати.»</p>
             <div class="review-person">
-              <div class="review-av"><img src="avatars/katya.jpg" alt=""></div>
+              <div class="review-av"><img src="avatars/katya.jpg" width="40" height="40" loading="lazy" decoding="async" alt=""></div>
               <div>
                 <div class="review-name">katya_k_05</div>
               </div>
@@ -1655,7 +1669,7 @@
             <span class="review-role">Самостійні тренування</span>
             <p class="review-quote">«Все під рукою. Щоразу пишу прогрес, і наступного разу, як роблю вправу, вже бачу вагу і коменти з минулих. Ну і так можу планувати наступні підходи.»</p>
             <div class="review-person">
-              <div class="review-av"><img src="avatars/dmytro.jpg" alt=""></div>
+              <div class="review-av"><img src="avatars/dmytro.jpg" width="40" height="40" loading="lazy" decoding="async" alt=""></div>
               <div>
                 <div class="review-name">oledius__8888</div>
               </div>
@@ -1751,10 +1765,12 @@
     </div>
   </div>
 
+  </main>
+
   <!-- ── FOOTER ── -->
   <footer>
     <a href="#" class="footer-brand">
-      <div class="footer-logo"><img src="logo.jpeg" alt="Training Tracker"></div>
+      <div class="footer-logo"><img src="logo-128.jpeg" width="28" height="28" loading="lazy" decoding="async" alt="Training Tracker"></div>
       <span class="footer-name">Training Tracker</span>
     </a>
     <span class="footer-copy">© 2026 Training Tracker. Усі права захищено.</span>
@@ -2087,6 +2103,51 @@
           }
         });
       });
+    })();
+  </script>
+
+  <script>
+    (function () {
+      function loadAnalytics() {
+        if (window.__ttAnalyticsLoaded) return;
+        window.__ttAnalyticsLoaded = true;
+
+        var fb = document.createElement('script');
+        fb.async = true;
+        fb.src = 'https://connect.facebook.net/en_US/fbevents.js';
+        document.head.appendChild(fb);
+
+        var pending = (window.posthog && window.posthog._q) ? window.posthog._q.slice() : [];
+
+        !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}p||((p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",p.onerror=function(){p=null},(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r));var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Oo Lo $o init rl nl tl el ll pa il hl Ko capture sl Ao gl calculateEventProperties pl register register_once register_for_session unregister unregister_for_session Xo ml getFeatureFlag getFeatureFlagPayload getFeatureFlagResult getAllFeatureFlags isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync wl identify setPersonProperties unsetPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset kl shutdown setIdentity clearIdentity get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException addExceptionStep captureLog startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty yl cl createPersonProfile setInternalOrTestUser bl Do No opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing dl debug ma kn getPageViewId captureTraceFeedback captureTraceMetric Go".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,[]);
+        posthog.init('phc_o2ccSiB5HsbdaZcHUmhN8KixGukH3Lgf3JusZLbgTfAd', {
+          api_host: 'https://eu.i.posthog.com',
+          defaults: '2026-05-30',
+          person_profiles: 'identified_only',
+        });
+        var host = location.hostname || '';
+        var environment =
+          host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0' || /\.local$/.test(host)
+            ? 'local'
+            : /stage|staging/.test(host)
+              ? 'stage'
+              : 'prod';
+        posthog.register({ app: 'landing', environment: environment });
+        pending.forEach(function (item) {
+          if (typeof posthog[item.m] === 'function') posthog[item.m].apply(posthog, item.a);
+        });
+      }
+
+      function schedule() {
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadAnalytics, { timeout: 2500 });
+        } else {
+          setTimeout(loadAnalytics, 1500);
+        }
+      }
+
+      if (document.readyState === 'complete') schedule();
+      else window.addEventListener('load', schedule);
     })();
   </script>
 </body>
